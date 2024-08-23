@@ -1,7 +1,6 @@
 import os
 import time
 import math
-import pickle
 import inspect
 import json
 import numpy as np
@@ -12,6 +11,7 @@ import argparse
 from contextlib import nullcontext
 from dataclasses import dataclass
 from q_learning_agent import QLearningAgent
+import fickling
 
 # --- BEGIN model.py ---
 class LayerNorm(nn.Module):
@@ -419,7 +419,7 @@ def train(dataset="shakespeare_char", out_dir="run_0", seed_offset=0):
     meta_vocab_size = None
     if os.path.exists(meta_path):
         with open(meta_path, "rb") as f:
-            meta = pickle.load(f)
+            meta = fickling.load(f)
         meta_vocab_size = meta["vocab_size"]
         print(f"found vocab_size = {meta_vocab_size} (inside {meta_path})")
 
@@ -624,7 +624,7 @@ def train(dataset="shakespeare_char", out_dir="run_0", seed_offset=0):
     assert os.path.exists(meta_path), "meta.pkl not found, please run training script first"
     print(f"Loading meta from {meta_path}...")
     with open(meta_path, 'rb') as f:
-        meta = pickle.load(f)
+        meta = fickling.load(f)
     stoi, itos = meta['stoi'], meta['itos']
     encode = lambda s: [stoi[c] for c in s]
     decode = lambda l: ''.join([itos[i] for i in l])
