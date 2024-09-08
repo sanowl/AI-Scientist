@@ -8,6 +8,7 @@ from ai_scientist.generate_ideas import search_for_papers
 from ai_scientist.llm import get_response_from_llm, extract_json_between_markers
 import re
 import json
+from security import safe_command
 
 
 # GENERATE LATEX
@@ -102,8 +103,7 @@ def compile_latex(cwd, pdf_file, timeout=30):
 
     for command in commands:
         try:
-            result = subprocess.run(
-                command,
+            result = safe_command.run(subprocess.run, command,
                 cwd=cwd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
