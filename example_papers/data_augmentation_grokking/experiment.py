@@ -1,6 +1,5 @@
 import argparse
 import abc
-import random
 from itertools import permutations
 from typing import Set, List, Tuple
 import os
@@ -10,6 +9,7 @@ from einops import rearrange, repeat
 import torch
 from torch.utils.data import IterableDataset
 from torch import nn, Tensor
+import secrets
 
 # Abstract base class for datasets
 class AbstractDataset(abc.ABC):
@@ -26,7 +26,7 @@ class AbstractDataset(abc.ABC):
         
         # Shuffle and split the dataset
         idxs = list(range(len(self.group_elements1) * len(self.group_elements2)))
-        random.shuffle(idxs)
+        secrets.SystemRandom().shuffle(idxs)
         split_point = int(len(idxs) * frac_train)
         self.train_pairs, self.val_pairs = idxs[:split_point], idxs[split_point:]
 
@@ -57,12 +57,12 @@ class AbstractDataset(abc.ABC):
 
     def fetch_train_example(self) -> Tuple[List[int], int, List]:
         """Fetch a random training example"""
-        idx = random.choice(self.train_pairs)
+        idx = secrets.choice(self.train_pairs)
         return self.fetch_example(idx)
 
     def fetch_val_example(self) -> Tuple[List[int], int, List]:
         """Fetch a random validation example"""
-        idx = random.choice(self.val_pairs)
+        idx = secrets.choice(self.val_pairs)
         return self.fetch_example(idx)
 
     def reverse_operands(self, a, b) -> Tuple:
@@ -83,9 +83,9 @@ class ModSumDataset(AbstractDataset):
         """Fetch an example with possible operand reversal and negation"""
         a = self.ordered_group_elements1[idx // len(self.group_elements2)]
         b = self.ordered_group_elements2[idx % len(self.group_elements2)]
-        if random.random() < 0.2:
+        if secrets.SystemRandom().random() < 0.2:
             a, b = self.reverse_operands(a, b)
-        if random.random() < 0.2:
+        if secrets.SystemRandom().random() < 0.2:
             a, b = self.negate_operands(a, b)
         c = self.fetch_output(a, b)
         equation = self.form_equation(a, b, c)
@@ -109,7 +109,7 @@ class ModSubtractDataset(AbstractDataset):
         """Fetch an example with possible operand reversal and negation"""
         a = self.ordered_group_elements1[idx // len(self.group_elements2)]
         b = self.ordered_group_elements2[idx % len(self.group_elements2)]
-        rand = random.random()
+        rand = secrets.SystemRandom().random()
         if rand < 0.2:
             a, b = self.reverse_operands(a, b)
         elif rand < 0.4:
@@ -136,7 +136,7 @@ class ModDivisionDataset(AbstractDataset):
         """Fetch an example with possible dividend negation"""
         a = self.ordered_group_elements1[idx // len(self.group_elements2)]
         b = self.ordered_group_elements2[idx % len(self.group_elements2)]
-        if random.random() < 0.2:
+        if secrets.SystemRandom().random() < 0.2:
             a, b = self.negate_operands(a, b)
         c = self.fetch_output(a, b)
         equation = self.form_equation(a, b, c)
