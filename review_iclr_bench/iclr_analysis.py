@@ -212,7 +212,7 @@ def download_paper_pdf(url, paper_id, verbose=True):
     # Download pdf and write to file
     paper_pdf = os.path.join("iclr_papers", f"{paper_id}.pdf")
     if not os.path.exists(paper_pdf):
-        response = requests.get(url)
+        response = requests.get(url, timeout=60)
         with open(paper_pdf, "wb") as f:
             f.write(response.content)
         if verbose:

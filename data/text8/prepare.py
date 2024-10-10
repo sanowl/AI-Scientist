@@ -13,7 +13,7 @@ import numpy as np
 input_file_path = os.path.join(os.path.dirname(__file__), 'text8')
 if not os.path.exists(input_file_path):
     data_url = 'http://mattmahoney.net/dc/text8.zip'
-    r = requests.get(data_url)
+    r = requests.get(data_url, timeout=60)
     with open(os.path.join(os.path.dirname(__file__), 'text8.zip'), 'wb') as f:
         f.write(r.content)
 
