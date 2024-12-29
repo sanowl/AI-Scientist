@@ -1,6 +1,5 @@
 import argparse
 import abc
-import random
 from itertools import permutations
 from typing import Set
 import os
@@ -10,6 +9,7 @@ from einops import rearrange, repeat
 import torch
 from torch.utils.data import IterableDataset
 from torch import nn, Tensor
+import secrets
 
 
 class AbstractDataset(abc.ABC):
@@ -24,7 +24,7 @@ class AbstractDataset(abc.ABC):
         self.n_vocab = len(self.idx2vocab)
         self.n_out = len(group_elements1.union(group_elements2))
         idxs = list(range(len(self.group_elements1) * len(self.group_elements2)))
-        random.shuffle(idxs)
+        secrets.SystemRandom().shuffle(idxs)
         self.train_pairs, self.val_pairs = (
             idxs[: int(len(idxs) * frac_train)],
             idxs[int(len(idxs) * frac_train) :],
@@ -51,11 +51,11 @@ class AbstractDataset(abc.ABC):
         return self.encode(equation[:-1]), (self.vocab2idx[c] - 2), equation
 
     def fetch_train_example(self):
-        idx = random.choice(self.train_pairs)
+        idx = secrets.choice(self.train_pairs)
         return self.fetch_example(idx)
 
     def fetch_val_example(self):
-        idx = random.choice(self.val_pairs)
+        idx = secrets.choice(self.val_pairs)
         return self.fetch_example(idx)
 
     def reverse_operands(self, a, b):
@@ -73,7 +73,7 @@ class ModSumDataset(AbstractDataset):
     def fetch_example(self, idx):
         a = self.ordered_group_elements1[idx // len(self.group_elements2)]
         b = self.ordered_group_elements2[idx % len(self.group_elements2)]
-        rand = random.random()
+        rand = secrets.SystemRandom().random()
         if rand < 0.15:
             a, b = self.reverse_operands(a, b)
         elif rand < 0.3:
@@ -99,7 +99,7 @@ class ModSubtractDataset(AbstractDataset):
     def fetch_example(self, idx):
         a = self.ordered_group_elements1[idx // len(self.group_elements2)]
         b = self.ordered_group_elements2[idx % len(self.group_elements2)]
-        rand = random.random()
+        rand = secrets.SystemRandom().random()
         if rand < 0.15:
             a, b = self.reverse_operands(a, b)
         elif rand < 0.3:
@@ -128,7 +128,7 @@ class ModDivisonDataset(AbstractDataset):
     def fetch_example(self, idx):
         a = self.ordered_group_elements1[idx // len(self.group_elements2)]
         b = self.ordered_group_elements2[idx % len(self.group_elements2)]
-        if random.random() < 0.3:
+        if secrets.SystemRandom().random() < 0.3:
             a, b = self.negate_operands(a, b)
         c = self.fetch_output(a, b)
         equation = self.form_equation(a, b, c)
