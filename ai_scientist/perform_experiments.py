@@ -4,6 +4,7 @@ import subprocess
 from subprocess import TimeoutExpired
 import sys
 import json
+from security import safe_command
 
 MAX_ITERS = 4
 MAX_RUNS = 5
@@ -42,8 +43,7 @@ def run_experiment(folder_name, run_num, timeout=7200):
         f"--out_dir=run_{run_num}",
     ]
     try:
-        result = subprocess.run(
-            command, cwd=cwd, stderr=subprocess.PIPE, text=True, timeout=timeout
+        result = safe_command.run(subprocess.run, command, cwd=cwd, stderr=subprocess.PIPE, text=True, timeout=timeout
         )
 
         if result.stderr:
@@ -93,8 +93,7 @@ def run_plotting(folder_name, timeout=600):
         "plot.py",
     ]
     try:
-        result = subprocess.run(
-            command, cwd=cwd, stderr=subprocess.PIPE, text=True, timeout=timeout
+        result = safe_command.run(subprocess.run, command, cwd=cwd, stderr=subprocess.PIPE, text=True, timeout=timeout
         )
 
         if result.stderr:
