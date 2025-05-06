@@ -7,6 +7,7 @@ from ai_scientist.llm import get_response_from_llm, extract_json_between_markers
 
 import requests
 import backoff
+from security import safe_requests
 
 S2_API_KEY = os.getenv("S2_API_KEY")
 
@@ -284,7 +285,7 @@ def on_backoff(details):
 def search_for_papers(query, result_limit=10) -> Union[None, List[Dict]]:
     if not query:
         return None
-    rsp = requests.get(
+    rsp = safe_requests.get(
         "https://api.semanticscholar.org/graph/v1/paper/search",
         headers={"X-API-KEY": S2_API_KEY},
         params={
