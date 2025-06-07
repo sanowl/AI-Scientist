@@ -4,7 +4,7 @@ import numpy as np
 import json
 import os
 import os.path as osp
-import pickle
+import fickling
 
 # LOAD FINAL RESULTS:
 datasets = ["circle", "dino", "line", "moons"]
@@ -27,7 +27,7 @@ for folder in folders:
     if folder.startswith("run") and osp.isdir(folder):
         with open(osp.join(folder, "final_info.json"), "r") as f:
             final_results[folder] = json.load(f)
-        all_results = pickle.load(open(osp.join(folder, "all_results.pkl"), "rb"))
+        all_results = fickling.load(open(osp.join(folder, "all_results.pkl"), "rb"))
         train_info[folder] = all_results
 
 # Create a programmatic color palette
