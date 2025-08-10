@@ -3,6 +3,7 @@ python iclr_analysis.py --num_reviews 500  --batch_size 50 --num_fs_examples 0 -
 """
 
 import sys
+from security import safe_requests
 
 sys.path.append("../")
 
@@ -15,7 +16,6 @@ from ai_scientist.perform_review import (
 import pathlib
 import pandas as pd
 import numpy as np
-import requests
 import argparse
 import os
 import time
@@ -212,7 +212,7 @@ def download_paper_pdf(url, paper_id, verbose=True):
     # Download pdf and write to file
     paper_pdf = os.path.join("iclr_papers", f"{paper_id}.pdf")
     if not os.path.exists(paper_pdf):
-        response = requests.get(url)
+        response = safe_requests.get(url)
         with open(paper_pdf, "wb") as f:
             f.write(response.content)
         if verbose:
